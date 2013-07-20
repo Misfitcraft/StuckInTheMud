@@ -1,0 +1,16 @@
+#ignore the below setting if inexperienced
+matchcheck: 2
+#length a match lasts for in seconds, 300 is 5 minutes
+matchlength: 300
+#arenas are named with numbers and are selected at random
+#every time a game is started
+#anything with a # before it is ignored
+#example below
+#note if at least one arena doesnt exist plugin error will
+#be thrown
+arenas:
+   1:
+     x: 50
+     y: 60
+     z: 50
+
