@@ -18,8 +18,12 @@ public class CommandStuck implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(label.equalsIgnoreCase("stuck") && args.length == 0){
 			displayHelp(sender);
-		}else if(label.equalsIgnoreCase("stuck") && args.length >= 1 && args[0].equalsIgnoreCase("start")){
-			inst.gameinst.start();
+		}else if(label.equalsIgnoreCase("stuck") && args.length >= 1 && args[0].equalsIgnoreCase("start") && sender.hasPermission("stuck.startgame")){
+			if(inst.getServer().getOnlinePlayers().length >= 3){
+				inst.gameinst.start();
+			}else{
+				sender.sendMessage(ChatColor.DARK_RED + "");
+			}
 		}
 		return false;
 	}

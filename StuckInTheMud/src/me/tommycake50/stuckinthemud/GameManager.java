@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -17,8 +18,8 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
 public class GameManager implements Listener {
-	ArrayList<String> stuckers;
-	HashMap<String, Boolean> stuckees;
+	public ArrayList<String> stuckers;
+	public HashMap<String, Boolean> stuckees;
 	StuckInTheMud inst;
 	int x;
 	int z;
@@ -29,6 +30,7 @@ public class GameManager implements Listener {
 	int added2;
 	int checktask;
 	int timetask;
+	ArrayList<String> donors;
 	
 	public GameManager(StuckInTheMud inst){
 		this.inst = inst;
@@ -44,19 +46,39 @@ public class GameManager implements Listener {
 	
 	private void setOneInThreeStuckeesAndStuckers() {
 		for(Player p : inst.getServer().getOnlinePlayers()){
-			if(!stuckers.contains(p.getName()) && !stuckees.containsKey(p.getName())){
-				three.add(p.getName());
+			if(stuckees.containsKey(p.getName()) || stuckers.contains(p.getName())){
+				donors.add(p.getName());
 			}
-			if(three.size() == 3){
-				for(int i = 0; i < 2; i++){
-					stuckees.put(three.get(r.nextInt(3)), false);
+		}
+		if(((inst.getServer().getOnlinePlayers().length - donors.size()) % 3) == 0){
+			for(Player p : inst.getServer().getOnlinePlayers()){
+				if(!stuckers.contains(p.getName()) && !stuckees.containsKey(p.getName())){
+					three.add(p.getName());
 				}
-				int currentrandom = 1;
-				while(currentrandom != added1 && currentrandom != added2){
-					currentrandom = r.nextInt(3);
+				if(three.size() == 3){
+					for(int i = 0; i < 2; i++){
+						stuckees.put(three.get(r.nextInt(3)), false);
+					}
+					int currentrandom = 1;
+					while(currentrandom != added1 && currentrandom != added2){
+						currentrandom = r.nextInt(3);
+					}
+					stuckers.add(three.get(currentrandom));
+					three.clear();
 				}
-				stuckers.add(three.get(currentrandom));
+			}	
+		}else{
+			for(Player p : inst.getServer().getOnlinePlayers()){
+				if(r.nextInt(3) == 0){
+					stuckers.add(p.getName());
+				}
 			}
+		}
+		for(String s : stuckers){
+			inst.getServer().getPlayer(s).sendMessage(ChatColor.DARK_BLUE + "You are a stucker, Stick all the stuckees!");
+		}
+		for(String s : stuckees.keySet()){
+			inst.getServer().getPlayer(s).sendMessage(ChatColor.DARK_BLUE + "You are a stuckee, Unstick all your fellow stuckees and avoid getting stuck!");
 		}
 	}
 
@@ -123,9 +145,11 @@ public class GameManager implements Listener {
 			e.setDamage((double)0);
 			if(stuckees.containsKey(victim.getName()) && stuckers.contains(((Player)e.getDamager()).getName())){
 				victim.addPotionEffect(PotionEffectType.SLOW.createEffect(999999999, 999999999));
+				stuckees.put(victim.getName(), true);
 			}else if(stuckees.containsKey(victim.getName()) && stuckees.containsKey(((Player)e.getDamager()).getName())){
 				if(victim.hasPotionEffect(PotionEffectType.SLOW)){
 					victim.removePotionEffect(PotionEffectType.SLOW);
+					stuckees.put(victim.getName(), false);
 				}
 			}
 		}
