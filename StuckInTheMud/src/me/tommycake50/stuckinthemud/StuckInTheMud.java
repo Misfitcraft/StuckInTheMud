@@ -18,5 +18,6 @@ public class StuckInTheMud extends JavaPlugin {
 		getServer().getPluginManager().registerEvents(new SignListener(this), this);
 		getCommand("Stuck").setExecutor(new CommandStuck(this));
 		getServer().setDefaultGameMode(GameMode.ADVENTURE);
+		config = getConfig();
 	}
 }

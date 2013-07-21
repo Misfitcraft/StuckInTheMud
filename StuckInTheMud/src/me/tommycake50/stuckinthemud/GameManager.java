@@ -44,6 +44,12 @@ public class GameManager implements Listener {
 		setOneInThreeStuckeesAndStuckers();
 	}
 	
+	private void clearUp() {
+		donors.clear();
+		stuckers.clear();
+		stuckees.clear();
+	}
+
 	private void setOneInThreeStuckeesAndStuckers() {
 		for(Player p : inst.getServer().getOnlinePlayers()){
 			if(stuckees.containsKey(p.getName()) || stuckers.contains(p.getName())){
@@ -116,6 +122,7 @@ public class GameManager implements Listener {
 			p.teleport(p.getWorld().getSpawnLocation());
 		}
 		inst.getServer().broadcastMessage("Team:" + string + " Were the winning team!");
+		clearUp();
 	}
 
 	@EventHandler
