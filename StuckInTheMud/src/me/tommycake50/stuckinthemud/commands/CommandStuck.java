@@ -20,12 +20,16 @@ public class CommandStuck implements CommandExecutor {
 			displayHelp(sender);
 		}else if(label.equalsIgnoreCase("stuck") && args.length >= 1 && args[0].equalsIgnoreCase("start") && sender.hasPermission("stuck.startgame")){
 			if(inst.getServer().getOnlinePlayers().length >= 3){
-				inst.gameinst.start();
+				if(inst.gameinst.isingame){
+					sender.sendMessage("Game is already on!");
+				}else{
+					inst.gameinst.start();
+				}
 			}else{
-				sender.sendMessage(ChatColor.DARK_RED + "");
+				sender.sendMessage(ChatColor.DARK_RED + "You need at least three players online to start a game of stuck!");
 			}
 		}
-		return false;
+		return true;
 	}
 
 	private void displayHelp(CommandSender sender) {

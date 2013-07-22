@@ -13,4 +13,7 @@ arenas:
      x: 50
      y: 60
      z: 50
+#the amount of arenas you have defined
+amountofarenas: 1
+
 

@@ -23,9 +23,19 @@ public class SignListener implements Listener {
 				switch(s.getLine(2)){
 					case "stuckers":
 						inst.gameinst.stuckers.add(e.getPlayer().getName());
+						inst.gameinst.donors.add(e.getPlayer().getName());
+						e.getPlayer().sendMessage("You have joined the stuckers!");
+						if(inst.gameinst.stuckees.containsKey(e.getPlayer().getName())){
+							inst.gameinst.stuckees.remove(e.getPlayer().getName());
+						}
 					break;
 					case "stuckees":
 						inst.gameinst.stuckees.put(e.getPlayer().getName(), false);
+						inst.gameinst.donors.add(e.getPlayer().getName());
+						e.getPlayer().sendMessage("You have joined the stuckees!");
+						if(inst.gameinst.stuckers.contains(e.getPlayer().getName())){
+							inst.gameinst.stuckers.remove(e.getPlayer().getName());
+						}
 					break;
 				}
 			}
