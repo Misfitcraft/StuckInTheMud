@@ -30,6 +30,7 @@ public class GameManager implements Listener {
 	int added2;
 	int checktask;
 	int timetask;
+	int xptask;
 	ArrayList<String> donors;
 	
 	public GameManager(StuckInTheMud inst){
@@ -44,12 +45,22 @@ public class GameManager implements Listener {
 		loadRandomArena();
 		teleportplayers();
 		setOneInThreeStuckeesAndStuckers();
+		givePlayersxp();
 	}
 	
+	private void givePlayersxp() {
+		for(Player p : inst.getServer().getOnlinePlayers()){
+			p.setLevel(inst.config.getInt("matchlength"));;
+		}
+	}
+
 	private void clearUp() {
 		donors.clear();
 		stuckers.clear();
 		stuckees.clear();
+		inst.getServer().getScheduler().cancelTask(xptask);
+		inst.getServer().getScheduler().cancelTask(timetask);
+		inst.getServer().getScheduler().cancelTask(checktask);
 	}
 
 	private void setOneInThreeStuckeesAndStuckers() {
@@ -106,7 +117,8 @@ public class GameManager implements Listener {
 
 	private void doScheduleTasks(){
 		timetask = inst.getServer().getScheduler().scheduleSyncDelayedTask(inst, new Runnable(){@Override public void run(){stop("stuckees"); inst.getServer().getScheduler().cancelTask(checktask);}}, inst.config.getInt("matchlength") * 20);
-		checktask = inst.getServer().getScheduler().scheduleSyncDelayedTask(inst, new Runnable(){@Override public void run(){if(hasended()){stop("stuckers"); inst.getServer().getScheduler().cancelTask(timetask);}}}, inst.config.getInt("matchcheck") * 20);
+		checktask = inst.getServer().getScheduler().scheduleSyncRepeatingTask(inst, new Runnable(){@Override public void run(){if(hasended()){stop("stuckers"); inst.getServer().getScheduler().cancelTask(timetask);}}}, inst.config.getInt("matchcheck") * 20, inst.config.getInt("matchcheck") * 20);
+		xptask = inst.getServer().getScheduler().scheduleSyncRepeatingTask(inst, new Runnable(){@Override public void run(){for(Player p : inst.getServer().getOnlinePlayers())p.setLevel(p.getLevel() - 1);}}, 20, 20);
 	}
 	
 	protected boolean hasended() {
