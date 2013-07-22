@@ -13,6 +13,7 @@ public class StuckInTheMud extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		saveDefaultConfig();
 		gameinst = new GameManager(this);
 		getServer().getPluginManager().registerEvents(gameinst, this);
 		getServer().getPluginManager().registerEvents(new SignListener(this), this);
