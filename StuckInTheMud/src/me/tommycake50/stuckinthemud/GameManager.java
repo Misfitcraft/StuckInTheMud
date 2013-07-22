@@ -35,6 +35,8 @@ public class GameManager implements Listener {
 	public GameManager(StuckInTheMud inst){
 		this.inst = inst;
 		r = new Random();
+		stuckees = new HashMap<String, Boolean>();
+		stuckers = new ArrayList<String>();
 	}
 	
 	public void start(){
