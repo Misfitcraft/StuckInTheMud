@@ -55,6 +55,7 @@ public class GameManager implements Listener {
 		for(String s : stuckees.keySet()){
 			inst.getServer().getPlayer(s).sendMessage(ChatColor.DARK_BLUE + "You are a stuckee, Unstick all your fellow stuckees and avoid getting stuck!");
 		}
+		inst.getServer().broadcastMessage(ChatColor.GOLD + "Grace period lasts for 10 seconds, RUN!!!");
 	}
 	
 	private void checkMultiples() {
@@ -129,7 +130,7 @@ public class GameManager implements Listener {
 		timetask = inst.getServer().getScheduler().scheduleSyncDelayedTask(inst, new Runnable(){@Override public void run(){stop("stuckees"); inst.getServer().getScheduler().cancelTask(checktask);}}, inst.config.getInt("matchlength") * 20);
 		checktask = inst.getServer().getScheduler().scheduleSyncRepeatingTask(inst, new Runnable(){@Override public void run(){if(hasended()){stop("stuckers"); inst.getServer().getScheduler().cancelTask(timetask);}}}, inst.config.getInt("matchcheck") * 20, inst.config.getInt("matchcheck") * 20);
 		xptask = inst.getServer().getScheduler().scheduleSyncRepeatingTask(inst, new Runnable(){@Override public void run(){for(Player p : inst.getServer().getOnlinePlayers())p.setLevel(p.getLevel() - 1);}}, 20, 20);
-		inst.getServer().getScheduler().scheduleSyncDelayedTask(inst, new Runnable(){@Override public void run(){graceperiod = false;}}, 5*20);
+		inst.getServer().getScheduler().scheduleSyncDelayedTask(inst, new Runnable(){@Override public void run(){graceperiod = false; inst.getServer().broadcastMessage(ChatColor.GREEN + "Grace period has ended! RUN SOME MORE!!!");}}, 10*20);
 	}
 	
 	protected boolean hasended() {
@@ -149,6 +150,10 @@ public class GameManager implements Listener {
 		inst.getServer().broadcastMessage("Team:" + string + " Were the winning team!");
 		clearUp();
 		isingame = false;
+		for(Player p : inst.getServer().getOnlinePlayers()){
+			p.setLevel(0);
+			p.setExp(0);
+		}
 	}
 
 	@EventHandler
@@ -168,8 +173,10 @@ public class GameManager implements Listener {
 			e.setDamage((double)0);
 			if(stuckees.containsKey(victim.getName()) && stuckers.contains(((Player)e.getDamager()).getName()) && !graceperiod && !stuckees.get(victim.getName())){
 				stuckees.put(victim.getName(), true);
-			}else if(stuckees.containsKey(victim.getName()) && stuckees.containsKey(((Player)e.getDamager()).getName())){
+				inst.getServer().broadcastMessage(ChatColor.RED + victim.getDisplayName() + "Was stuck by: " + ((Player)e.getDamager()).getDisplayName() + "!");
+			}else if(stuckees.containsKey(victim.getName()) && stuckees.containsKey(((Player)e.getDamager()).getName()) && !stuckees.get(((Player)e.getDamager()).getName())){
 					stuckees.put(victim.getName(), false);
+					inst.getServer().broadcastMessage(ChatColor.RED + victim.getDisplayName() + "Was unstuck by: " + ((Player)e.getDamager()).getDisplayName() + "!");
 			}
 		}
 	}
