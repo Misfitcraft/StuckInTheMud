@@ -6,6 +6,7 @@ import java.util.Random;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,6 +16,8 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerVelocityEvent;
+import org.bukkit.scoreboard.ScoreboardManager;
+import org.bukkit.scoreboard.Team;
 import org.bukkit.util.Vector;
 
 public class GameManager implements Listener {
@@ -24,6 +27,9 @@ public class GameManager implements Listener {
 	int x;
 	int z;
 	int y;
+	int stuckx;
+	int stucky;
+	int stuckz;
 	ArrayList<String> three = new ArrayList<String>();
 	Random r;
 	String addedplayer;
@@ -33,15 +39,25 @@ public class GameManager implements Listener {
 	public ArrayList<String> donors = new ArrayList<String>();
 	public boolean graceperiod = true;
 	public boolean isingame;
+	ScoreboardManager s;
+	public Team stuckers1;
+	public Team stuckees1;
 	
 	public GameManager(StuckInTheMud inst){
 		this.inst = inst;
 		r = new Random();
 		stuckees = new HashMap<String, Boolean>();
 		stuckers = new ArrayList<String>();
+		s = inst.getServer().getScoreboardManager();
+		stuckers1 = s.getMainScoreboard().registerNewTeam("stuckers");
+		stuckees1 = s.getMainScoreboard().registerNewTeam("stuckees");
 	}
 	
 	public void start(){
+		stuckers1.setAllowFriendlyFire(true);
+		stuckees1.setAllowFriendlyFire(true);
+		stuckers1.setPrefix(ChatColor.valueOf(inst.config.getString("stuckercolor").toUpperCase()) + "");
+		stuckees1.setPrefix(ChatColor.valueOf(inst.config.getString("stuckeecolor").toUpperCase()) + "");
 		doScheduleTasks();
 		loadRandomArena();
 		teleportplayers();
@@ -55,6 +71,7 @@ public class GameManager implements Listener {
 		for(String s : stuckees.keySet()){
 			inst.getServer().getPlayer(s).sendMessage(ChatColor.DARK_BLUE + "You are a stuckee, Unstick all your fellow stuckees and avoid getting stuck!");
 		}
+		graceperiod = true;
 		inst.getServer().broadcastMessage(ChatColor.GOLD + "Grace period lasts for 10 seconds, RUN!!!");
 	}
 	
@@ -80,6 +97,12 @@ public class GameManager implements Listener {
 		inst.getServer().getScheduler().cancelTask(timetask);
 		inst.getServer().getScheduler().cancelTask(checktask);
 		graceperiod = true;
+		for(OfflinePlayer op : stuckers1.getPlayers()){
+			stuckers1.removePlayer(op);
+		}
+		for(OfflinePlayer op : stuckees1.getPlayers()){
+			stuckees1.removePlayer(op);
+		}
 	}
 
 	private void setOneInThreeStuckeesAndStuckers() {
@@ -110,6 +133,12 @@ public class GameManager implements Listener {
 				}
 			}
 		}
+		for(String s : stuckees.keySet()){
+			stuckees1.addPlayer(inst.getServer().getOfflinePlayer(s));
+		}
+		for(String s : stuckers){
+			stuckers1.addPlayer(inst.getServer().getOfflinePlayer(s));
+		}
 	}
 
 	private void teleportplayers() {
@@ -124,6 +153,9 @@ public class GameManager implements Listener {
 		x = cs.getInt("x");
 		y = cs.getInt("y");
 		z = cs.getInt("z");
+		stuckx = cs.getInt("stuckx");
+		stucky = cs.getInt("stucky");
+		stuckz = cs.getInt("stuckz");
 	}
 
 	private void doScheduleTasks(){
@@ -174,7 +206,7 @@ public class GameManager implements Listener {
 			if(stuckees.containsKey(victim.getName()) && stuckers.contains(((Player)e.getDamager()).getName()) && !graceperiod && !stuckees.get(victim.getName())){
 				stuckees.put(victim.getName(), true);
 				inst.getServer().broadcastMessage(ChatColor.RED + victim.getDisplayName() + "Was stuck by: " + ((Player)e.getDamager()).getDisplayName() + "!");
-			}else if(stuckees.containsKey(victim.getName()) && stuckees.containsKey(((Player)e.getDamager()).getName()) && !stuckees.get(((Player)e.getDamager()).getName())){
+			}else if(stuckees.containsKey(victim.getName()) && stuckees.containsKey(((Player)e.getDamager()).getName()) && !stuckees.get(((Player)e.getDamager()).getName()) && stuckees.get(victim.getName())){
 					stuckees.put(victim.getName(), false);
 					inst.getServer().broadcastMessage(ChatColor.RED + victim.getDisplayName() + "Was unstuck by: " + ((Player)e.getDamager()).getDisplayName() + "!");
 			}
