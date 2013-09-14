@@ -318,8 +318,8 @@ public class GameManager implements Listener {
 			e.setDamage((double)0);
 			if(stuckees.containsKey(victim.getName()) && stuckers.contains(((Player)e.getDamager()).getName()) && !graceperiod && !stuckees.get(victim.getName())){
 				stuckees.put(victim.getName(), true);
-				victim.addPotionEffect(PotionEffectType.SLOW.createEffect(100000000, 255));
-				victim.addPotionEffect(PotionEffectType.JUMP.createEffect(100000000, 128));
+				victim.addPotionEffect(PotionEffectType.SLOW.createEffect(Integer.MAX_VALUE, 255));
+				victim.addPotionEffect(PotionEffectType.JUMP.createEffect(Integer.MAX_VALUE, 128));
 				inst.getServer().broadcastMessage(ChatColor.RED + victim.getDisplayName() + "Was stuck by: " + ((Player)e.getDamager()).getDisplayName() + "!");
 			}else if(stuckees.containsKey(victim.getName()) && stuckees.containsKey(((Player)e.getDamager()).getName()) && !stuckees.get(((Player)e.getDamager()).getName()) && stuckees.get(victim.getName())){
 					stuckees.put(victim.getName(), false);
